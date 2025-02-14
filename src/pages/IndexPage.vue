@@ -45,7 +45,7 @@
             class="q-mx-sm q-my-sm bg-white rounded-borders cursor-pointer flex items-center justify-center gift-box"
             :class="{ opened: openedGifts[index] }"
             @click="openGift(index)"
-            style="width:110px; height:110px; font-size:4rem; overflow: hidden"
+            style="width:20vw; height:20vw; font-size:8rem; overflow: hidden"
           >
             <transition name="flip">
               <template v-if="!openedGifts[index]">
@@ -76,7 +76,7 @@ const isMainButtonVisible = ref(false);
 const tgId = ref('')
 
 const gifts = ref<Gift[]>([]);
-const openedGifts = ref<boolean[]>(new Array(12).fill(false)); // Инициализация с 12 элементами
+const openedGifts = ref<boolean[]>(new Array(9).fill(false)); // Инициализация с 12 элементами
 const isGiftOpened = ref(false);
 
 username.value = tg?.initDataUnsafe?.user?.first_name || 'Гость';
@@ -114,7 +114,7 @@ const getRandomCoupon = (): string => {
 const generateGifts = (): Gift[] => {
   const generatedGifts: Gift[] = [];
 
-  for (let i = 1; i <= 12; i++) {
+  for (let i = 1; i <= 9; i++) {
     generatedGifts.push({
       id: i,
       coupon: getRandomCoupon(),
@@ -161,7 +161,7 @@ onMounted(() => {
 <style scoped>
 .grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* Оставляем 4 колонки */
+  grid-template-columns: repeat(3, 1fr); /* Оставляем 4 колонки */
 }
 .gift-box {
   transition: transform 0.5s;
