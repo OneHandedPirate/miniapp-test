@@ -37,30 +37,92 @@
           class="q-mx-auto q-my-md"
           rounded
         />
+
+        <div class="bg-primary shadow-1 rounded-borders q-mt-md grid grid-cols-6 gap-4">
+          <div
+            v-for="(gift, index) in gifts"
+            :key="gift.id"
+            class="q-mx-sm q-my-sm bg-white rounded-borders cursor-pointer flex items-center justify-center gift-box"
+            :class="{ opened: openedGifts[index] }"
+            @click="openGift(index)"
+            style="width:110px; height:110px; font-size:4rem; overflow: hidden"
+          >
+            <transition name="flip">
+              <template v-if="!openedGifts[index]">
+                <span>🎁</span>
+              </template>
+              <template v-else>
+                <span>🎉</span>
+              </template>
+            </transition>
+          </div>
+        </div>
       </q-card-section>
     </q-card>
   </q-page>
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue'
 import { tg } from 'boot/telegram'
+
+interface Gift {
+  id: number;
+  coupon: string;
+}
 
 const username = ref('');
 const isMainButtonVisible = ref(false);
 const tgId = ref('')
 
+const gifts = ref<Gift[]>([]);
+const openedGifts = ref<boolean[]>(new Array(12).fill(false)); // Инициализация с 12 элементами
+const isGiftOpened = ref(false);
+
 username.value = tg?.initDataUnsafe?.user?.first_name || 'Гость';
 tgId.value = `${tg?.initDataUnsafe?.user?.id || 'Не определен'}`
 
+const coupons = [
+  "Приват",
+  "Кальян",
+  "Танец на коленях",
+  "Бутылка шампанского",
+  "VIP-зона",
+  "Бесплатное посещение",
+  "Ужин с девушкой",
+  "Подарок от администрации",
+  "Час в саунe",
+  "Бесплатный вход",
+  "Скидка 20% на услуги",
+  "Участие в розыгрыше",
+];
+
 const showMainButton = () => {
-    tg.MainButton.setText('Закрыть')
-    tg.MainButton.onClick(() => {
-      closeApp();
-    })
-    tg.MainButton.show();
-    isMainButtonVisible.value = true;
+  tg.MainButton.setText('Закрыть')
+  tg.MainButton.onClick(() => {
+    closeApp();
+  })
+  tg.MainButton.show();
+  isMainButtonVisible.value = true;
 }
+
+const getRandomCoupon = (): string => {
+  const randomIndex = Math.floor(Math.random() * coupons.length);
+  return coupons[randomIndex] as string;
+};
+
+const generateGifts = (): Gift[] => {
+  const generatedGifts: Gift[] = [];
+
+  for (let i = 1; i <= 12; i++) {
+    generatedGifts.push({
+      id: i,
+      coupon: getRandomCoupon(),
+    });
+  }
+
+  return generatedGifts;
+};
 
 const hideMainButton = () => {
   tg.MainButton.hide();
@@ -77,7 +139,39 @@ const openScanner = () => {
   });
 }
 
-function closeApp() {
+const closeApp = () => {
   tg.close();
 }
+
+const openGift = (index: number) => {
+  if (!isGiftOpened.value) {
+    openedGifts.value[index] = true;
+    isGiftOpened.value = true;
+    if (gifts.value[index]?.coupon) {
+      tg.showAlert(gifts.value[index].coupon);
+    }
+  }
+}
+
+onMounted(() => {
+  gifts.value = generateGifts();
+})
 </script>
+
+<style scoped>
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* Оставляем 4 колонки */
+}
+.gift-box {
+  transition: transform 0.5s;
+  position: relative;
+}
+.flip-enter-active, .flip-leave-active {
+  transition: transform 0.5s;
+  transform-style: preserve-3d;
+}
+.flip-enter-from, .flip-leave-to {
+  transform: rotateY(180deg);
+}
+</style>
