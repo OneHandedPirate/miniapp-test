@@ -45,7 +45,7 @@
             class="q-mx-sm q-my-sm bg-white rounded-borders cursor-pointer flex items-center justify-center gift-box"
             :class="{ opened: openedGifts[index] }"
             @click="openGift(index)"
-            style="width:20vw; height:20vw; font-size:8rem; overflow: hidden"
+            style="width:20vw; height:20vw; font-size:9em; overflow: hidden"
           >
             <transition name="flip">
               <template v-if="!openedGifts[index]">
