@@ -1,43 +1,83 @@
 <template>
-  <q-page class="row items-center justify-evenly">
-    <example-component
-      title="Example component"
-      active
-      :todos="todos"
-      :meta="meta"
-    ></example-component>
+  <q-page padding>
+    <q-card
+      class="flex column justify-center items-center"
+      style="min-height:96vh"
+    >
+      <q-card-section class="text-center flex column">
+        <div class="text-h5">Привет, {{ username }}!</div>
+        <div class="text-h6">Твой ТГ ID: {{ tgId }}</div>
+        <q-btn
+          v-if="!isMainButtonVisible"
+          label="Показать MainButton"
+          color="primary"
+          @click="showMainButton"
+          class="q-mx-auto q-my-md"
+          rounded
+        />
+        <q-btn
+          v-else
+          label="Скрыть MainButton"
+          color="primary"
+          @click="hideMainButton"
+          class="q-mx-auto q-my-md"
+          rounded
+        />
+        <q-btn
+          label="Show alert"
+          color="primary"
+          @click="showAlert"
+          class="q-mx-auto q-my-md"
+          rounded
+        />
+        <q-btn
+          label="Открыть QR-сканер"
+          color="primary"
+          @click="openScanner"
+          class="q-mx-auto q-my-md"
+          rounded
+        />
+      </q-card-section>
+    </q-card>
   </q-page>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { ref } from 'vue';
-import type { Todo, Meta } from 'components/models';
-import ExampleComponent from 'components/ExampleComponent.vue';
+import { tg } from 'boot/telegram'
 
-const todos = ref<Todo[]>([
-  {
-    id: 1,
-    content: 'ct1'
-  },
-  {
-    id: 2,
-    content: 'ct2'
-  },
-  {
-    id: 3,
-    content: 'ct3'
-  },
-  {
-    id: 4,
-    content: 'ct4'
-  },
-  {
-    id: 5,
-    content: 'ct5'
-  }
-]);
+const username = ref('');
+const isMainButtonVisible = ref(false);
+const tgId = ref('')
 
-const meta = ref<Meta>({
-  totalCount: 1200
-});
+username.value = tg?.initDataUnsafe?.user?.first_name || 'Гость';
+tgId.value = `${tg?.initDataUnsafe?.user?.id || 'Не определен'}`
+
+const showMainButton = () => {
+    tg.MainButton.setText('Закрыть')
+    tg.MainButton.onClick(() => {
+      closeApp();
+    })
+    tg.MainButton.show();
+    isMainButtonVisible.value = true;
+}
+
+const hideMainButton = () => {
+  tg.MainButton.hide();
+  isMainButtonVisible.value = false;
+}
+
+const showAlert = () => {
+  tg.showAlert('Бу! Испугался? Не бойся.')
+}
+
+const openScanner = () => {
+  tg.showScanQrPopup({text: 'Наведите на QR-код'}, (text: string) => {
+    tg.showAlert(text)
+  });
+}
+
+function closeApp() {
+  tg.close();
+}
 </script>
