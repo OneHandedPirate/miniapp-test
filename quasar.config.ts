@@ -20,6 +20,7 @@ export default defineConfig((/* ctx */) => {
     ],
 
     build: {
+      publicPath: '/miniapp-test/',
       target: {
         browser: [ 'es2022', 'firefox115', 'chrome115', 'safari14' ],
         node: 'node20'
