@@ -73,7 +73,11 @@ const showAlert = () => {
 
 const openScanner = () => {
   tg.showScanQrPopup({text: 'Наведите на QR-код'}, (text: string) => {
-    tg.showAlert(text)
+    if (text.startsWith('http')) {
+      window.open(text, '_blank');
+    } else {
+      tg.showAlert(text)
+    }
   });
 }
 
