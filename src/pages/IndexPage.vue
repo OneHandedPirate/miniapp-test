@@ -7,6 +7,7 @@
       <q-card-section class="text-center flex column">
         <div class="text-h5">Привет, {{ username }}!</div>
         <div class="text-h6">Твой ТГ ID: {{ tgId }}</div>
+        <div class="text-h6">Init Data: {{ initData }}</div>
         <q-btn
           v-if="!isMainButtonVisible"
           label="Показать MainButton"
@@ -49,10 +50,12 @@ import { tg } from 'boot/telegram'
 const username = ref('');
 const isMainButtonVisible = ref(false);
 const tgId = ref('')
+const initData = ref('')  
 
 username.value = tg?.initDataUnsafe?.user?.first_name || 'Гость';
 tgId.value = `${tg?.initDataUnsafe?.user?.id || 'Не определен'}`
-
+initData.value = tg.initData
+  
 const showMainButton = () => {
   tg.MainButton.setText('Закрыть')
   tg.MainButton.onClick(() => {
